@@ -5,16 +5,20 @@ const { userModel } = require("../model");
 const VerfiySignUpToken = require("../middleware/verfiySignUpToken");
 const jwt = require("jsonwebtoken");
 router.post("/signup", VerfiySignUpToken, async (req, res) => {
-  //   const { password } = req.body;
-  const newUser = await userModel.create(req.body);
-  const token = jwt.sign({ id: newUser.id, role: newUser.role }, process.env.SECRET_KEY, { expiresIn: "7d" });
-  console.log("the token", token);
-  // newUser.token = token;
-  // await newUser.save();
-  //handle error here
-  // console.log("//////////////NEW User", newUser);
-
-  res.json({ ...newUser.dataValues, token });
+  const body = req.body;
+  console.log("the body", body);
+  setTimeout(async () => {
+    if (!req.body.firstname || !req.body.lastname || !req.body.username || !req.body.password)
+      return res.status(400).send({ message: "all fields are required" });
+    const newUser = await userModel.create(req.body);
+    const token = jwt.sign({ role: newUser.role }, process.env.SECRET_KEY, { expiresIn: "2h" });
+    console.log("the token", token);
+    // newUser.token = token;
+    // await newUser.save();
+    //handle error here
+    // console.log("//////////////NEW User", newUser);
+    return res.status(200).json({ token });
+  }, 2000);
 });
 
 router.post("/signin", async (req, res) => {
@@ -35,7 +39,7 @@ router.post("/signin", async (req, res) => {
   // if (!isPasswordCorrect) return res.status(404).send("password not correct");
   if (res.status(200)) {
     // const userLoggedIn = { id: user.id, username: user.username, role: user.role };
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECRET_KEY, { expiresIn: "1d" });
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECRET_KEY, { expiresIn: "2h" });
     const userLoggedIn = { ...user.dataValues, token };
 
     return res.status(200).json(userLoggedIn);
