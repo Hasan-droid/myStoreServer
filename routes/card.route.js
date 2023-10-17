@@ -7,11 +7,12 @@ const enumValues = ["waterSpaces", "candles"];
 
 const checkReqBody = (req, res, next) => {
   try {
-    if (!req.body.title || !req.body.description || !req.body.price || !req.body.category || req.body.price < 0) {
+    console.log("/////req.body", req.body);
+    if (!req.body.name || !req.body.description || !req.body.price || !req.body.category || req.body.price < 0) {
       return res.status(400).json({ msg: "please include all fields" });
     }
     if (
-      req.body.title.trim() === null ||
+      req.body.name.trim() === null ||
       req.body.description === "" ||
       req.body.price === "" ||
       req.body.category === ""
@@ -40,7 +41,12 @@ router.get("/", async (req, res) => {
   const limit = req.query.limit || 2;
   // console.log(first)
   const offset = req.query.offset || 0;
-  const cards = await cardModel.findAll({ limit, offset, where: { category: req.query.page || enumValues[0] } });
+  const cards = await cardModel.findAll({
+    limit,
+    offset,
+    where: { category: req.query.page || enumValues[0] },
+    order: [["createdAt", "DESC"]],
+  });
   res.json(cards);
 });
 
@@ -69,7 +75,14 @@ router.post("/create100/:category", checkReqBody, async (req, res) => {
 // });
 
 router.post("/", verifyToken, checkReqBody, async (req, res) => {
-  const newCard = await cardModel.create(req.body);
+  console.log("before create", req.body);
+  const cardData = {
+    title: req.body.name,
+    description: req.body.description,
+    price: req.body.price,
+    category: req.body.category,
+  };
+  const newCard = await cardModel.create(cardData);
   //handle error here
   console.log("//////////////NEW CARD", newCard);
   res.json(newCard);

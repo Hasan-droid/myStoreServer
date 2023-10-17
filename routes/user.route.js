@@ -4,6 +4,18 @@ const router = express.Router();
 const { userModel } = require("../model");
 const VerfiySignUpToken = require("../middleware/verfiySignUpToken");
 const jwt = require("jsonwebtoken");
+router.post("/signup/admin", async (req, res) => {
+  const body = req.body;
+  console.log("the body", body);
+  const newUser = await userModel.create(req.body);
+  const token = jwt.sign({ role: newUser.role }, process.env.SECRET_KEY, { expiresIn: "2h" });
+  console.log("the token", token);
+  // newUser.token = token;
+  // await newUser.save();
+  //handle error here
+  // console.log("//////////////NEW User", newUser);
+  return res.status(200).json({ token });
+});
 router.post("/signup", VerfiySignUpToken, async (req, res) => {
   const body = req.body;
   console.log("the body", body);
@@ -40,8 +52,9 @@ router.post("/signin", async (req, res) => {
   if (res.status(200)) {
     // const userLoggedIn = { id: user.id, username: user.username, role: user.role };
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECRET_KEY, { expiresIn: "2h" });
-    const userLoggedIn = { ...user.dataValues, token };
-
+    const userLoggedIn = { token };
+    //add token to the header
+    res.header("Authorization", token);
     return res.status(200).json(userLoggedIn);
   }
 
