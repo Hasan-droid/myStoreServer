@@ -41,6 +41,7 @@ router.get("/", async (req, res) => {
   const limit = req.query.limit || 2;
   // console.log(first)
   const offset = req.query.offset || 0;
+  console.log("req.query.page", req.query.page);
   const cards = await cardModel.findAll({
     limit,
     offset,

@@ -37,27 +37,28 @@ router.post("/signin", async (req, res) => {
   console.log(" the body", req.body);
   const { password, username } = req.body;
 
-  if (!password) return res.status(400).send({ filed: "password", message: "this filed is required" });
-  if (!username) return res.status(400).send({ filed: "username", message: "this filed is required" });
-  const user = await userModel.findOne({ where: { username } });
+  setTimeout(async () => {
+    if (!password) return res.status(400).send({ filed: "password", message: "this filed is required" });
+    if (!username) return res.status(400).send({ filed: "username", message: "this filed is required" });
+    const user = await userModel.findOne({ where: { username } });
 
-  if (!user) return res.status(404).send("user not found");
+    if (!user) return res.status(404).send("user not found");
 
-  //   const hashedPassword = await bcrypt.hash(password, 8);
-  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    //   const hashedPassword = await bcrypt.hash(password, 8);
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
-  //   console.log("the enter pass", hashedPassword);
-  if (!user || !isPasswordCorrect) return res.status(401).send("user not found");
-  // if (!isPasswordCorrect) return res.status(404).send("password not correct");
-  if (res.status(200)) {
-    // const userLoggedIn = { id: user.id, username: user.username, role: user.role };
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECRET_KEY, { expiresIn: "2h" });
-    const userLoggedIn = { token };
-    //add token to the header
-    res.header("Authorization", token);
-    return res.status(200).json(userLoggedIn);
-  }
-
+    //   console.log("the enter pass", hashedPassword);
+    if (!user || !isPasswordCorrect) return res.status(401).send("user not found");
+    // if (!isPasswordCorrect) return res.status(404).send("password not correct");
+    if (res.status(200)) {
+      // const userLoggedIn = { id: user.id, username: user.username, role: user.role };
+      const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECRET_KEY, { expiresIn: "2h" });
+      const userLoggedIn = { token };
+      //add token to the header
+      res.header("Authorization", token);
+      return res.status(200).json(userLoggedIn);
+    }
+  }, 2000);
   //handle error here
   // console.log("//////////////NEW User", newUser);
 });
