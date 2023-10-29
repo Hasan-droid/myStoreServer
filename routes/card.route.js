@@ -89,4 +89,14 @@ router.post("/", verifyToken, checkReqBody, async (req, res) => {
   res.json(newCard);
 });
 
+router.delete("/:id", verifyToken, async (req, res) => {
+  const card = await cardModel.findByPk(req.params.id);
+  if (card) {
+    await card.destroy();
+    res.json(card);
+  } else {
+    res.status(404).send("not found");
+  }
+});
+
 exports.router = router;
