@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+const ip = "172.16.10.99";
 const path = require("path");
 const db = require("./model").sequelize;
 const cardRouter = require("./routes/card.route");
@@ -26,7 +27,7 @@ app.get("/", (req, res) => {
 
 db.sync({ force: false })
   .then(() => {
-    app.listen(port, () => {
+    app.listen(port, ip, () => {
       console.log(`server is running on port ${port}`);
     });
   })
