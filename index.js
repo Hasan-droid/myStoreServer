@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
-const port = 3000;
-const ip = "172.16.10.99";
+const port = process.env.PORT || 3000;
+const ip = process.env.IP || "";
 const path = require("path");
 const db = require("./model").sequelize;
 const cardRouter = require("./routes/card.route");
