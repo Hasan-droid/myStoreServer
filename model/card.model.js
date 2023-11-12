@@ -19,5 +19,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
   });
+  Card.associate = (models) => {
+    Card.hasMany(models.Image, { foreignKey: "cardId" });
+  };
   return Card;
 };

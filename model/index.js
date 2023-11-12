@@ -15,9 +15,16 @@ const sequelizeOption = {};
 
 let sequelize = new Sequelize(POSTGRES_URL, sequelizeOption);
 
+const Card = require("./card.model")(sequelize, DataTypes);
+const productImage = require("./productImage.model")(sequelize, DataTypes);
+
+Card.hasMany(productImage, { foreignKey: "cardId" });
+productImage.belongsTo(Card, { foreignKey: "cardId" });
+
 const db = {};
 db.sequelize = sequelize;
-db.cardModel = require("./card.model")(sequelize, DataTypes);
+db.cardModel = Card;
+db.productImageModel = productImage;
 db.chartModel = require("./chart.model")(sequelize, DataTypes);
 db.userModel = require("./users.model")(sequelize, DataTypes);
 

@@ -2,13 +2,13 @@ const express = require("express");
 const verifyToken = require("../middleware/VerfiyToken");
 const router = express.Router();
 const { cardModel } = require("../model");
+const { productImageModel } = require("../model");
 const uploadImage = require("../js/UploadImage");
 
 const enumValues = ["waterSpaces", "candles"];
 
 const checkReqBody = (req, res, next) => {
   try {
-    console.log("/////req.body", req.body);
     if (!req.body.name || !req.body.description || !req.body.price || !req.body.category || req.body.price < 0) {
       return res.status(400).json({ msg: "please include all fields" });
     }
@@ -49,7 +49,18 @@ router.get("/", async (req, res) => {
     where: { category: req.query.page || enumValues[0] },
     order: [["createdAt", "DESC"]],
   });
-  res.json(cards);
+  const cardsWithImages = await Promise.all(
+    cards.map(async (card) => {
+      const images = await productImageModel.findAll({
+        where: { cardId: card.id },
+        order: [["createdAt", "DESC"]],
+      });
+      // Add the 'images' property to each card
+      return { ...card.toJSON(), images };
+    })
+  );
+
+  res.json(cardsWithImages);
 });
 
 router.post("/create100/:category", checkReqBody, async (req, res) => {
@@ -77,15 +88,24 @@ router.post("/create100/:category", checkReqBody, async (req, res) => {
 // });
 
 router.post("/", verifyToken, checkReqBody, async (req, res) => {
-  console.log("before create", req.body);
-  uploadImage(req.body.image);
+  // console.log("before create", req.body);
+  const imageUrl = await uploadImage(req.body.image);
+  if (!imageUrl) return res.status(400).json({ msg: "upload image problem" });
   const cardData = {
     title: req.body.name,
     description: req.body.description,
     price: req.body.price,
     category: req.body.category,
   };
-  const newCard = await cardModel.create(cardData);
+  const newCard = await cardModel
+    .create(cardData)
+    .then(async (card) => {
+      const image = await productImageModel.create({ url: imageUrl, cardId: card.id });
+      console.log("imageCreated", image);
+    })
+    .catch((err) => {
+      console.log("error creating image", err);
+    });
   //handle error here
   console.log("//////////////NEW CARD", newCard);
   res.json(newCard);
