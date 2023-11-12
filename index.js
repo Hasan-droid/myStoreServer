@@ -7,10 +7,12 @@ const db = require("./model").sequelize;
 const cardRouter = require("./routes/card.route");
 const chartRouter = require("./routes/chart.route");
 const userRouter = require("./routes/user.route");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 
 app.use(cors());
-app.use(express.json());
+//set the server to recive multipart/form-data (file) and json
+app.use(bodyParser.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false }));
 // app.use(express.static(path.join(__dirname, "public")));
 // app.use("/api", require("./routes/members"));

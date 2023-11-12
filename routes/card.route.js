@@ -2,6 +2,7 @@ const express = require("express");
 const verifyToken = require("../middleware/VerfiyToken");
 const router = express.Router();
 const { cardModel } = require("../model");
+const uploadImage = require("../js/UploadImage");
 
 const enumValues = ["waterSpaces", "candles"];
 
@@ -77,6 +78,7 @@ router.post("/create100/:category", checkReqBody, async (req, res) => {
 
 router.post("/", verifyToken, checkReqBody, async (req, res) => {
   console.log("before create", req.body);
+  uploadImage(req.body.image);
   const cardData = {
     title: req.body.name,
     description: req.body.description,
