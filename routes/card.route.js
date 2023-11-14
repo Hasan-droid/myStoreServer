@@ -3,7 +3,9 @@ const verifyToken = require("../middleware/VerfiyToken");
 const router = express.Router();
 const { cardModel } = require("../model");
 const { productImageModel } = require("../model");
-const uploadImage = require("../js/UploadImage");
+const { uploadImage } = require("../js/UploadImage");
+const { updateImage } = require("../js/UploadImage");
+const { deleteImage } = require("../js/UploadImage");
 
 const enumValues = ["waterSpaces", "candles"];
 
@@ -89,6 +91,7 @@ router.post("/create100/:category", checkReqBody, async (req, res) => {
 
 router.post("/", verifyToken, checkReqBody, async (req, res) => {
   // console.log("before create", req.body);
+  debugger;
   const imageUrl = await uploadImage(req.body.image);
   if (!imageUrl) return res.status(400).json({ msg: "upload image problem" });
   const cardData = {
@@ -113,6 +116,12 @@ router.post("/", verifyToken, checkReqBody, async (req, res) => {
 
 router.delete("/:id", verifyToken, async (req, res) => {
   const card = await cardModel.findByPk(req.params.id);
+  //find all images of the card
+  const images = await productImageModel.findAll({ where: { cardId: req.params.id } });
+  //delete the image from cloudinary
+  await Promise.all(images.map(async (image) => await deleteImage(image.url)));
+  //delete all images of the card
+  await Promise.all(images.map(async (image) => await image.destroy()));
   if (card) {
     await card.destroy();
     res.json(card);
@@ -122,6 +131,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
 });
 
 router.put("/:id", verifyToken, checkReqBody, async (req, res) => {
+  debugger;
   const card = await cardModel.findByPk(req.params.id);
   if (card) {
     card.title = req.body.name;
@@ -129,7 +139,22 @@ router.put("/:id", verifyToken, checkReqBody, async (req, res) => {
     card.price = req.body.price;
     card.category = req.body.category;
     await card.save();
-    res.json(card);
+    let image = null;
+    const getImage = (await productImageModel.findAll({ where: { url: req.body.imageUrl } }))[0];
+    if (getImage) {
+      getImage.url = await updateImage(req.body.image, getImage.url);
+      await getImage.save();
+      image = getImage;
+
+      console.log("image updated", { images: image });
+    }
+    if (!getImage) {
+      const uploadNewImage = await uploadImage(req.body.image);
+      const newImage = await productImageModel.create({ url: uploadNewImage, cardId: card.id });
+      image = newImage;
+      console.log("imageCreated", newImage);
+    }
+    res.status(200).json({ ...card.toJSON(), images: image });
   } else {
     res.status(404).send("not found");
   }
