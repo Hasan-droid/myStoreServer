@@ -132,35 +132,39 @@ router.delete("/:id", verifyToken, async (req, res) => {
 
 router.put("/:id", verifyToken, checkReqBody, async (req, res) => {
   debugger;
-  const card = await cardModel.findByPk(req.params.id);
-  if (card) {
-    card.title = req.body.name;
-    card.description = req.body.description;
-    card.price = req.body.price;
-    card.category = req.body.category;
-    await card.save();
-    const getImage = (await productImageModel.findAll({ where: { url: req.body.imageUrl } }))[0];
-    if (!req.body.image) {
-      return res.status(200).json({ ...card.toJSON(), images: getImage || [] });
-    }
+  try {
+    const card = await cardModel.findByPk(req.params.id);
+    if (card) {
+      card.title = req.body.name;
+      card.description = req.body.description;
+      card.price = req.body.price;
+      card.category = req.body.category;
+      await card.save();
+      const getImage = (await productImageModel.findAll({ where: { url: req.body.imageUrl } }))[0];
+      if (!req.body.image) {
+        return res.status(200).json({ ...card.toJSON(), images: getImage || [] });
+      }
 
-    let image = null;
-    if (getImage) {
-      getImage.url = await updateImage(req.body.image, getImage.url);
-      await getImage.save();
-      image = getImage;
+      let image = null;
+      if (getImage) {
+        getImage.url = await updateImage(req.body.image, getImage.url);
+        await getImage.save();
+        image = getImage;
 
-      console.log("image updated", { images: image });
+        console.log("image updated", { images: image });
+      }
+      if (!getImage) {
+        const uploadNewImage = await uploadImage(req.body.image);
+        const newImage = await productImageModel.create({ url: uploadNewImage, cardId: card.id });
+        image = newImage;
+        console.log("imageCreated", newImage);
+      }
+      res.status(200).json({ ...card.toJSON(), images: image });
+    } else {
+      res.status(404).send("not found");
     }
-    if (!getImage) {
-      const uploadNewImage = await uploadImage(req.body.image);
-      const newImage = await productImageModel.create({ url: uploadNewImage, cardId: card.id });
-      image = newImage;
-      console.log("imageCreated", newImage);
-    }
-    res.status(200).json({ ...card.toJSON(), images: image });
-  } else {
-    res.status(404).send("not found");
+  } catch (err) {
+    console.log("put router error", err);
   }
 });
 
