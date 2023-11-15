@@ -10,6 +10,11 @@ const opts = {
   overwrite: true,
   invalidate: true,
   resource_type: "image",
+  aspect_ratio: "1:1",
+  effect: "auto_color",
+  gravity: "auto",
+  width: 1000,
+  crop: "fill",
 };
 
 exports.uploadImage = (image) => {
