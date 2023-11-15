@@ -12,7 +12,7 @@ const cors = require("cors");
 
 app.use(cors());
 //set the server to recive multipart/form-data (file) and json
-app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: false }));
 // app.use(express.static(path.join(__dirname, "public")));
 // app.use("/api", require("./routes/members"));
