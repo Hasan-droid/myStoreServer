@@ -139,8 +139,12 @@ router.put("/:id", verifyToken, checkReqBody, async (req, res) => {
     card.price = req.body.price;
     card.category = req.body.category;
     await card.save();
-    let image = null;
     const getImage = (await productImageModel.findAll({ where: { url: req.body.imageUrl } }))[0];
+    if (!req.body.image) {
+      return res.status(200).json({ ...card.toJSON(), images: getImage || [] });
+    }
+
+    let image = null;
     if (getImage) {
       getImage.url = await updateImage(req.body.image, getImage.url);
       await getImage.save();
