@@ -1,5 +1,5 @@
 const express = require("express");
-const verifyToken = require("../middleware/VerfiyToken");
+const verifyAdminToken = require("../middleware/VerfiyAdminToken");
 const router = express.Router();
 const { cardModel } = require("../model");
 const { productImageModel } = require("../model");
@@ -89,7 +89,7 @@ router.post("/create100/:category", checkReqBody, async (req, res) => {
 //   }
 // });
 
-router.post("/", verifyToken, checkReqBody, async (req, res) => {
+router.post("/", verifyAdminToken, checkReqBody, async (req, res) => {
   // console.log("before create", req.body);
   debugger;
   const imageUrl = await uploadImage(req.body.image);
@@ -114,7 +114,7 @@ router.post("/", verifyToken, checkReqBody, async (req, res) => {
   res.json(newCard);
 });
 
-router.delete("/:id", verifyToken, async (req, res) => {
+router.delete("/:id", verifyAdminToken, async (req, res) => {
   const card = await cardModel.findByPk(req.params.id);
   //find all images of the card
   const images = await productImageModel.findAll({ where: { cardId: req.params.id } });
@@ -130,7 +130,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
   }
 });
 
-router.put("/:id", verifyToken, checkReqBody, async (req, res) => {
+router.put("/:id", verifyAdminToken, checkReqBody, async (req, res) => {
   debugger;
   try {
     const card = await cardModel.findByPk(req.params.id);

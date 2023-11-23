@@ -23,7 +23,13 @@ router.post("/signup", VerfiySignUpToken, async (req, res) => {
     if (!req.body.firstname || !req.body.lastname || !req.body.username || !req.body.password)
       return res.status(400).send({ message: "all fields are required" });
     const newUser = await userModel.create(req.body);
-    const token = jwt.sign({ role: newUser.role }, process.env.SECRET_KEY, { expiresIn: "2h" });
+    const token = jwt.sign(
+      { role: newUser.role, email: user.username, name: `${user.firstname} ${user.lastname}` },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "2h",
+      }
+    );
     console.log("the token", token);
     // newUser.token = token;
     // await newUser.save();
@@ -52,7 +58,13 @@ router.post("/signin", async (req, res) => {
     // if (!isPasswordCorrect) return res.status(404).send("password not correct");
     if (res.status(200)) {
       // const userLoggedIn = { id: user.id, username: user.username, role: user.role };
-      const token = jwt.sign({ id: user.id, role: user.role }, process.env.SECRET_KEY, { expiresIn: "2h" });
+      const token = jwt.sign(
+        { role: user.role, email: user.username, name: `${user.firstname} ${user.lastname}` },
+        process.env.SECRET_KEY,
+        {
+          expiresIn: "2h",
+        }
+      );
       const userLoggedIn = { token };
       //add token to the header
       res.header("Authorization", token);

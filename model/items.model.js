@@ -2,8 +2,13 @@ const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
   const item = sequelize.define("item", {
-    image: {
-      type: DataTypes.STRING,
+    itemId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    images: {
+      //array of strings
+      type: DataTypes.ARRAY(DataTypes.STRING),
     },
     category: {
       type: DataTypes.STRING,
@@ -17,7 +22,7 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    totalOrdered: {
+    quantity: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },

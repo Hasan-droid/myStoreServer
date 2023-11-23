@@ -8,7 +8,7 @@ module.exports = (sequelize) => {
     },
     deliveredDate: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: true,
     },
     orderStatus: {
       //want the type to be ENUM
