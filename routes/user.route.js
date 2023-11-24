@@ -68,6 +68,7 @@ router.post("/signin", async (req, res) => {
       const userLoggedIn = { token };
       //add token to the header
       res.header("Authorization", token);
+      console.log("user logged In");
       return res.status(200).json(userLoggedIn);
     }
   }, 2000);
