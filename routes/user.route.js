@@ -24,7 +24,7 @@ router.post("/signup", VerfiySignUpToken, async (req, res) => {
       return res.status(400).send({ message: "all fields are required" });
     const newUser = await userModel.create(req.body);
     const token = jwt.sign(
-      { role: newUser.role, email: user.username, name: `${user.firstname} ${user.lastname}` },
+      { role: newUser.role, email: newUser.username, name: `${newUser.firstname} ${newUser.lastname}` },
       process.env.SECRET_KEY,
       {
         expiresIn: "2h",
