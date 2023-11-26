@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { customerModel } = require("../model");
+const { orderModel } = require("../model");
 const VerifyUserToken = require("../middleware/VerifyUserToken");
 
 router.post("/", VerifyUserToken, async (req, res) => {
@@ -42,6 +43,26 @@ router.post("/", VerifyUserToken, async (req, res) => {
     })
   );
   return res.status(200).json({ msg: "order created successfully" });
+});
+
+router.get("/orders", async (req, res) => {
+  debugger;
+  const customer = req.query;
+  const orders = await customerModel.findAll({
+    order: [[orderModel, "createdAt", "DESC"]],
+    where: { email: customer.email },
+    include: { model: orderModel },
+  });
+  //map order.phone and order.orders in same array of objects
+  const mapOrders = orders
+    .map((customer) => {
+      return customer.orders.map((order) => {
+        return { phone: customer.phone, ...order.dataValues };
+      });
+    })
+    .flat();
+
+  return res.status(200).json([...mapOrders]);
 });
 
 exports.router = router;
