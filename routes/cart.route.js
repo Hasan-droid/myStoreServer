@@ -46,7 +46,6 @@ router.post("/", VerifyUserToken, async (req, res) => {
 });
 
 router.get("/orders", async (req, res) => {
-  debugger;
   const customer = req.query;
   const orders = await customerModel.findAll({
     order: [[orderModel, "createdAt", "DESC"]],
@@ -61,8 +60,9 @@ router.get("/orders", async (req, res) => {
       });
     })
     .flat();
-
-  return res.status(200).json([...mapOrders]);
+  setTimeout(() => {
+    return res.status(200).json([...mapOrders]);
+  }, 2000);
 });
 
 exports.router = router;
