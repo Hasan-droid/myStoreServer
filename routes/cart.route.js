@@ -60,9 +60,7 @@ router.get("/orders", async (req, res) => {
       });
     })
     .flat();
-  setTimeout(() => {
-    return res.status(200).json([...mapOrders]);
-  }, 2000);
+  return res.status(200).json([...mapOrders]);
 });
 
 exports.router = router;
