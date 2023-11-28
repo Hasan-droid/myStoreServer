@@ -6,6 +6,10 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    itemName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     images: {
       //array of strings
       type: DataTypes.ARRAY(DataTypes.STRING),
