@@ -65,34 +65,5 @@ router.get("/orders", async (req, res) => {
     .flat();
   return res.status(200).json([...mapOrders]);
 });
-router.get("/inbox/:id", async (req, res) => {
-  debugger;
-  const orederId = req.params.id;
-  const items = await itemModel.findAll({ where: { orderId: orederId } });
-  return res.status(200).json([...items]);
-});
-
-router.get("/inbox", async (req, res) => {
-  // const customer = req.query;
-  const orders = await customerModel.findAll({
-    order: [[orderModel, "createdAt", "DESC"]],
-    include: { model: orderModel },
-  });
-  //map order.phone and order.orders in same array of objects
-  const mapOrders = orders
-    .map((customer) => {
-      return customer.orders.map((order) => {
-        return {
-          customerName: customer.name,
-          phoneNumber: customer.phone,
-          address: customer.address,
-          email: customer.email,
-          ...order.dataValues,
-        };
-      });
-    })
-    .flat();
-  return res.status(200).json([...mapOrders]);
-});
 
 exports.router = router;

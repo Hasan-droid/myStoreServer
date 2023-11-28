@@ -7,6 +7,7 @@ const db = require("./model").sequelize;
 const cardRouter = require("./routes/card.route");
 const cartRouter = require("./routes/cart.route");
 const userRouter = require("./routes/user.route");
+const inboxRouter = require("./routes/inbox.route");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/gallery", cardRouter.router);
 app.use("/cart", cartRouter.router);
 app.use("/user", userRouter.router);
+app.use("/inbox", inboxRouter.router);
 //catch the route that not exist
 app.use((req, res, next) => {
   res.status(404).send("not found");
