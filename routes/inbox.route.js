@@ -36,4 +36,12 @@ router.get("/", async (req, res) => {
   return res.status(200).json([...mapOrders]);
 });
 
+router.put("/:id", async (req, res) => {
+  debugger;
+  const orderId = parseInt(req.params.id);
+  const order = req.body;
+  const updatedOrder = await orderModel.update(order, { where: { id: orderId } });
+  return res.status(200).json({ msg: "order updated successfully" });
+});
+
 exports.router = router;
