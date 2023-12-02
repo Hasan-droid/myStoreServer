@@ -50,7 +50,16 @@ router.put("/:id", async (req, res) => {
   const orderId = parseInt(req.params.id);
   const order = req.body;
   const updatedOrder = await orderModel.update(order, { where: { id: orderId } });
-  return res.status(200).json({ msg: "order updated successfully" });
+  const getUpdatedOrder = await orderModel.findByPk(orderId);
+  const customer = await customerModel.findByPk(getUpdatedOrder.customerId);
+  const data = {
+    customerName: customer.name,
+    phoneNumber: customer.phone,
+    address: customer.address,
+    email: customer.email,
+    ...getUpdatedOrder.dataValues,
+  };
+  return res.status(200).json({ msg: "order updated successfully", updatedOrder: data });
 });
 
 exports.router = router;
