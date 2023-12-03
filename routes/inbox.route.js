@@ -47,7 +47,6 @@ router.get("/", async (req, res) => {
     orders: mapOrders,
     numberOfPendingOrders,
   };
-  console.log("data", data);
   return res.status(200).json(data);
 });
 
