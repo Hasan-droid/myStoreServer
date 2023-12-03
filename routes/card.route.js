@@ -1,35 +1,12 @@
 const express = require("express");
 const verifyAdminToken = require("../middleware/VerfiyAdminToken");
+const checkReqBody = require("../middleware/CheckReqBody");
 const router = express.Router();
 const { cardModel } = require("../model");
 const { productImageModel } = require("../model");
 const { uploadImage } = require("../js/UploadImage");
 const { updateImage } = require("../js/UploadImage");
 const { deleteImage } = require("../js/UploadImage");
-
-const enumValues = ["waterSpaces", "candles"];
-
-const checkReqBody = (req, res, next) => {
-  try {
-    if (!req.body.name || !req.body.description || !req.body.price || !req.body.category || req.body.price < 0) {
-      return res.status(400).json({ msg: "please include all fields" });
-    }
-    if (
-      req.body.name.trim() === null ||
-      req.body.description === "" ||
-      req.body.price === "" ||
-      req.body.category === ""
-    ) {
-      return res.status(400).json({ msg: "please include all fields" });
-    }
-    if (!enumValues.includes(req.body.category) || !enumValues.includes(req.body.category)) {
-      return res.status(400).json({ msg: "please include valid category" });
-    }
-    next();
-  } catch (err) {
-    console.log(err);
-  }
-};
 
 router.get("/:id", async (req, res) => {
   const card = await cardModel.findByPk(req.params.id);
@@ -78,16 +55,6 @@ router.post("/create100/:category", checkReqBody, async (req, res) => {
   }
   res.send(`created 100 cards in ${req.body.category} category`);
 });
-// router.post("/create100", checkReqBody, async (req, res) => {
-//   for (let i = 0; i < 100; i++) {
-//     await cardModel.create({
-//       title: `card ${i}`,
-//       description: `card ${i} description`,
-//       price: Math.floor(Math.random() * 1000),
-//     });
-//     console.log("req.params.category", req.params.category);
-//   }
-// });
 
 router.post("/", verifyAdminToken, checkReqBody, async (req, res) => {
   // console.log("before create", req.body);
