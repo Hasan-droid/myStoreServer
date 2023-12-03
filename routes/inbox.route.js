@@ -3,9 +3,9 @@ const router = express.Router();
 const { customerModel } = require("../model");
 const { orderModel } = require("../model");
 const { itemModel } = require("../model");
-const VerifyUserToken = require("../middleware/VerifyUserToken");
 const VerfiyAdminToken = require("../middleware/VerfiyAdminToken");
-const { off } = require("process");
+
+router.use(VerfiyAdminToken);
 
 router.get("/:id", async (req, res) => {
   debugger;
