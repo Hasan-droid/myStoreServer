@@ -17,20 +17,20 @@ router.get("/:id", async (req, res) => {
 router.get("/", async (req, res) => {
   debugger;
   const { limit, offset } = req.query;
+
   // const customer = req.query;
   const orders = await customerModel.findAll({
-    //order the orders according to pending orders status plus date of creation
-    order: [
-      //pending orderStatus first
-      // [orderModel, "orderStatus", "ASC"],
-      [orderModel, "createdAt", "DESC"],
-    ],
     include: { model: orderModel },
+    order: [[orderModel, "id", "desc"]],
   });
   //map order.phone and order.orders in same array of objects
+  let numberOfPendingOrders = 0;
   const mapOrders = orders
     .map((customer) => {
       return customer.orders.map((order) => {
+        if (order.dataValues.orderStatus === "pending") {
+          numberOfPendingOrders++;
+        }
         return {
           customerName: customer.name,
           phoneNumber: customer.phone,
@@ -42,7 +42,13 @@ router.get("/", async (req, res) => {
     })
     .flat()
     .slice(offset, offset + limit);
-  return res.status(200).json([...mapOrders]);
+
+  const data = {
+    orders: mapOrders,
+    numberOfPendingOrders,
+  };
+  console.log("data", data);
+  return res.status(200).json(data);
 });
 
 router.put("/:id", async (req, res) => {

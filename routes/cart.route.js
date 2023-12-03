@@ -51,7 +51,7 @@ router.post("/", VerifyUserToken, async (req, res) => {
 router.get("/orders", async (req, res) => {
   const customer = req.query;
   const orders = await customerModel.findAll({
-    order: [[orderModel, "createdAt", "DESC"]],
+    order: [[orderModel, "id", "desc"]],
     where: { email: customer.email },
     include: { model: orderModel },
   });
