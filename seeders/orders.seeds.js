@@ -4,11 +4,12 @@ const casual = require("casual");
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     try {
+      const customers = await queryInterface.sequelize.query(`SELECT id from customers;`);
       const ordersData = Array.from({ length: 15 }).map(() => ({
         totalPrice: casual.integer(1, 1000),
         deliveredDate: Math.random() > 0.5 ? casual.date("YYYY-MM-DD") : null,
         orderStatus: "pending",
-        customerId: 99,
+        customerId: casual.random_element(customers[0]).id,
         createdAt: new Date(),
         updatedAt: new Date(),
       }));
