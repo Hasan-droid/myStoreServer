@@ -4,6 +4,7 @@ const router = express.Router();
 const { userModel } = require("../model");
 const VerfiySignUpToken = require("../middleware/verfiySignUpToken");
 const jwt = require("jsonwebtoken");
+const verfiyAdmin = require("../middleware/VerfiyAdminToken");
 router.post("/signup/admin", async (req, res) => {
   const body = req.body;
   console.log("the body", body);
@@ -37,6 +38,18 @@ router.post("/signup", VerfiySignUpToken, async (req, res) => {
     // console.log("//////////////NEW User", newUser);
     return res.status(200).json({ token });
   }, 2000);
+});
+
+router.put("/update", verfiyAdmin, async (req, res) => {
+  const { oldname, newname } = req.body;
+  userModel
+    .update({ username: newname }, { where: { username: oldname } })
+    .then((result) => {
+      res.status(200).json({ message: `updated: new username is ${newname}` });
+    })
+    .catch((err) => {
+      res.status(400).json({ message: "not updated" });
+    });
 });
 
 router.post("/signin", async (req, res) => {
