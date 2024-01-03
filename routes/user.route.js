@@ -5,6 +5,8 @@ const { userModel } = require("../model");
 const VerfiySignUpToken = require("../middleware/verfiySignUpToken");
 const jwt = require("jsonwebtoken");
 const verfiyAdmin = require("../middleware/VerfiyAdminToken");
+const crypto = require("crypto");
+const sendVerificationEmail = require("../js/sendVerificationEmail");
 router.post("/signup/admin", async (req, res) => {
   const body = req.body;
   console.log("the body", body);
@@ -19,11 +21,15 @@ router.post("/signup/admin", async (req, res) => {
 });
 router.post("/signup", VerfiySignUpToken, async (req, res) => {
   const body = req.body;
-  console.log("the body", body);
   setTimeout(async () => {
     if (!req.body.firstname || !req.body.lastname || !req.body.username || !req.body.password)
       return res.status(400).send({ message: "all fields are required" });
+    const verificationToken = crypto.randomBytes(20).toString("hex");
+    req.body.verificationToken = verificationToken;
+    req.body.verifiedUser = false;
+    console.log("the body", body);
     const newUser = await userModel.create(req.body);
+    sendVerificationEmail(newUser.username, verificationToken);
     const token = jwt.sign(
       { role: newUser.role, email: newUser.username, name: `${newUser.firstname} ${newUser.lastname}` },
       process.env.SECRET_KEY,
@@ -50,6 +56,19 @@ router.put("/update", verfiyAdmin, async (req, res) => {
     .catch((err) => {
       res.status(400).json({ message: "not updated" });
     });
+});
+
+router.get("/verify", async (req, res) => {
+  debugger;
+  const { email, token } = req.query;
+  const user = await userModel.findOne({ where: { username: email } });
+  if (!user) return res.status(404).send("user not found");
+  if (user.verificationToken === token) {
+    user.verifiedUser = true;
+    user.save();
+    return res.status(200).send("user verified");
+  }
+  return res.status(400).send("user not verified");
 });
 
 router.post("/signin", async (req, res) => {
