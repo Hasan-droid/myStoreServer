@@ -29,7 +29,6 @@ router.post("/signup", VerfiySignUpToken, async (req, res) => {
     req.body.verifiedUser = false;
     console.log("the body", body);
     const newUser = await userModel.create(req.body);
-    sendVerificationEmail(newUser.username, verificationToken);
     const token = jwt.sign(
       { role: newUser.role, email: newUser.username, name: `${newUser.firstname} ${newUser.lastname}` },
       process.env.SECRET_KEY,
@@ -37,11 +36,11 @@ router.post("/signup", VerfiySignUpToken, async (req, res) => {
         expiresIn: "2h",
       }
     );
-    console.log("the token", token);
-    // newUser.token = token;
-    // await newUser.save();
-    //handle error here
-    // console.log("//////////////NEW User", newUser);
+    if (!req.body.role) {
+      //no role in the request body because the "user" role is default value
+      //from user model
+      sendVerificationEmail(newUser.username, verificationToken);
+    }
     return res.status(200).json({ token });
   }, 2000);
 });

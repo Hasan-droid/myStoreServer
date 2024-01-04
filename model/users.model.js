@@ -33,11 +33,11 @@ module.exports = (sequelize, DataTypes) => {
     verifiedUser: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
-      allowNull: false,
+      allowNull: true,
     },
     verificationToken: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   });
 
