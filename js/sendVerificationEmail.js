@@ -2,6 +2,7 @@ const nodemailer = require("nodemailer");
 module.exports = (email, token) => {
   const transporter = nodemailer.createTransport({
     service: "Outlook365",
+    logger: true,
     auth: {
       user: "newStore2025@outlook.com",
       pass: "112233asd.&",
