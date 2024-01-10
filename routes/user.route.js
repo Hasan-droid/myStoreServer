@@ -90,7 +90,7 @@ router.post("/signin", async (req, res) => {
         { role: user.role, email: user.username, name: `${user.firstname} ${user.lastname}` },
         process.env.SECRET_KEY,
         {
-          expiresIn: "2h",
+          expiresIn: process.env.TOKEN_EXPIRY,
         }
       );
       const userLoggedIn = { token };

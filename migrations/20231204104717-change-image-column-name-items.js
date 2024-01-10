@@ -1,13 +1,13 @@
 "use strict";
 
 /** @type {import('sequelize-cli').Migration} */
-
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn("customers", "email", {
-      type: Sequelize.STRING,
-      allowNull: false,
-    });
+    try {
+      await queryInterface.renameColumn("items", "image", "images");
+    } catch (err) {
+      console.log("error in up", err);
+    }
     /**
      * Add altering commands here.
      *
@@ -17,7 +17,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeColumn("customers", "email");
     /**
      * Add reverting commands here.
      *

@@ -15,7 +15,7 @@ module.exports = {
       },
       deliveredDate: {
         type: Sequelize.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       orderStatus: {
         //want the type to be ENUM

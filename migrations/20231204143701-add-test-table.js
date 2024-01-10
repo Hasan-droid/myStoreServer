@@ -1,13 +1,17 @@
 "use strict";
 
 /** @type {import('sequelize-cli').Migration} */
-
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.addColumn("customers", "email", {
-      type: Sequelize.STRING,
-      allowNull: false,
+    await queryInterface.createTable("test", {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      name: Sequelize.STRING,
     });
+
     /**
      * Add altering commands here.
      *
@@ -17,7 +21,7 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.removeColumn("customers", "email");
+    await queryInterface.dropTable("test");
     /**
      * Add reverting commands here.
      *
