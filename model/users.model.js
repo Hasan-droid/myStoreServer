@@ -30,6 +30,15 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: "user",
       allowNull: false,
     },
+    verifiedUser: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: true,
+    },
+    verificationToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   });
 
   User.addHook("beforeCreate", async (user, options) => {
