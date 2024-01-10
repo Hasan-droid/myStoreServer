@@ -18,6 +18,7 @@ router.post("/signup/admin", async (req, res) => {
   return res.status(200).json({ token });
 });
 router.post("/signup", VerfiySignUpToken, async (req, res) => {
+  debugger;
   const body = req.body;
   console.log("the body", body);
   setTimeout(async () => {
