@@ -10,9 +10,13 @@ const userRouter = require("./routes/user.route");
 const inboxRouter = require("./routes/inbox.route");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
-app.use(cors());
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 //set the server to recive multipart/form-data (file) and json
+// app.options("*", cors(corsOptions));
 app.use(bodyParser.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: false }));
 // app.use(express.static(path.join(__dirname, "public")));
