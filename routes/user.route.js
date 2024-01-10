@@ -7,6 +7,7 @@ const jwt = require("jsonwebtoken");
 const verfiyAdmin = require("../middleware/VerfiyAdminToken");
 const crypto = require("crypto");
 const sendVerificationEmail = require("../js/sendVerificationEmail");
+
 router.post("/signup/admin", async (req, res) => {
   const body = req.body;
   console.log("the body", body);
@@ -67,9 +68,9 @@ router.get("/verify", async (req, res) => {
     user.save();
     // return res.status(200).send("user verified");
     //if user verified redirect to the sigin page and send success message
-    return res.redirect(`${process.env.CLIENT_URL}/signin?verified=true`);
+    return res.status(200).redirect(`${process.env.CLIENT_URL}/signin?verified=true`);
   }
-  return res.redirect(`${process.env.CLIENT_URL}/signin?verified=false`);
+  return res.status(500).redirect(`${process.env.CLIENT_URL}/signin?verified=false`);
 });
 
 router.post("/signin", async (req, res) => {
@@ -77,14 +78,13 @@ router.post("/signin", async (req, res) => {
   const { password, username } = req.body;
 
   setTimeout(async () => {
-    debugger;
     if (!password) return res.status(400).send({ filed: "password", message: "this filed is required" });
     if (!username) return res.status(400).send({ filed: "username", message: "this filed is required" });
     const user = await userModel.findOne({ where: { username } });
     if (!user) return res.status(404).send("Incorrect username or password");
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect) return res.status(401).send("Incorrect username or password");
-    if (!user.verifiedUser) return res.status(404).send("please verify your email");
+    if (!isPasswordCorrect) return res.status(404).send("Incorrect username or password");
+    if (!user.verifiedUser) return res.status(401).send("please verify your email");
     if (res.status(200)) {
       const token = jwt.sign(
         { role: user.role, email: user.username, name: `${user.firstname} ${user.lastname}` },
